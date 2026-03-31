@@ -4,9 +4,18 @@ import { pluginReact } from "@rsbuild/plugin-react";
 // https://rsbuild.dev/guide/basic/configure-rsbuild
 export default defineConfig({
   plugins: [pluginReact()],
+  tools: {
+    postcss: {
+      postcssOptions: {
+        plugins: [
+          ["@tailwindcss/postcss", {}],
+        ],
+      },
+    },
+  },
   html: {
-    favicon: "src/assets/favicon.ico",
-    title: "Loco SaaS Starter",
+    favicon: "src/assets/kylemoji.png",
+    title: "Movie Mate Match Maker",
   },
   server: {
     proxy: {
