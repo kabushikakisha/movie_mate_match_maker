@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-
+import {useParams} from 'react-router-dom';
 
 interface IMovie {
     name: string;
@@ -9,7 +9,9 @@ interface IMovie {
 }
 
 const defaultMovie : IMovie = {name: '', time: 0, genre: 'N/A', availability: 'N/A'};
-export default function Movie( {id} : {id: number}) {
+export default function Movie() {
+    const {id} = useParams();
+
     useEffect(() => {
         if (id) {
             setLoading(true);
