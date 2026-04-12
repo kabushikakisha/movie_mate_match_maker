@@ -1,11 +1,16 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
-use loco_rs::prelude::*;
-use serde::{Deserialize, Serialize};
 use axum::debug_handler;
+use loco_rs::prelude::*;
+use sea_orm::sea_query::{Expr, Query};
+use serde::{Deserialize, Serialize};
 
-use crate::models::_entities::ratings::{ActiveModel, Entity, Model};
+use crate::models::_entities::{
+    movies,
+    ratings::{ActiveModel, Column, Entity, Model},
+    users,
+};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -62,11 +67,30 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
     format::json(load_item(&ctx, id).await?)
 }
 
+#[debug_handler]
+pub async fn unrated(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response> {
+    let user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
+
+    let rated_subquery = Query::select()
+        .column(Column::MovieId)
+        .from(Entity)
+        .and_where(Expr::col(Column::UserId).eq(user.id))
+        .to_owned();
+
+    let unrated_movies = movies::Entity::find()
+        .filter(movies::Column::Id.not_in_subquery(rated_subquery))
+        .all(&ctx.db)
+        .await?;
+
+    format::json(unrated_movies)
+}
+
 pub fn routes() -> Routes {
     Routes::new()
         .prefix("api/ratings/")
         .add("/", get(list))
         .add("/", post(add))
+        .add("unrated", get(unrated))
         .add("{id}", get(get_one))
         .add("{id}", delete(remove))
         .add("{id}", put(update))
