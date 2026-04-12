@@ -1,25 +1,29 @@
-import {Routes, Route, Link} from "react-router-dom";
+import {Routes, Route} from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Home from "./pages/Home";
-import Movies from "./pages/Movies";
 import About from "./pages/About";
 import Movie from "./pages/Movie";
+import RateMovies from "./pages/RateMovies";
+import ChooseMovies from "./pages/ChooseMovies";
 
-export default function App () {
+export default function App() {
     return (
         <div>
-            <NavBar 
+            <NavBar
             items={[
                 {label: "Home", to: "/"},
+                {label: "Enter Movie", to: "/movie"},
+                {label: "Rate Movies", to: "/rate"},
+                {label: "Choose Movies", to: "/choose"},
                 {label: "About", to: "/about"},
-                {label: "Movies", to: "/movies"}
             ]}
             />
             <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/movie" element={<Movie />} />
+                <Route path="/rate" element={<RateMovies />} />
+                <Route path="/choose" element={<ChooseMovies />} />
                 <Route path="/about" element={<About />} />
-                <Route path="/movies" element={<Movies />} />
-                <Route path="/movies/:id" element={<Movie />} />
             </Routes>
         </div>
     )
