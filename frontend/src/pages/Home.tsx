@@ -1,17 +1,14 @@
 import { Link } from "react-router-dom";
+import { appRoutes } from "../routes";
 
-const pages = [
-    { label: "Enter Movie", to: "/movie", description: "Add a movie to the list" },
-    { label: "Rate Movies", to: "/rate", description: "Rate movies you've seen" },
-    { label: "Choose Movies", to: "/choose", description: "Pick what to watch together" },
-];
+const homeCards = appRoutes.filter((r) => r.description !== undefined);
 
 export default function Home() {
     return (
         <div className="mx-auto mt-24 max-w-2xl px-4">
             <h1 className="mb-8 text-3xl font-bold text-white">Movie Mate Match Maker</h1>
             <div className="flex flex-col gap-4">
-                {pages.map((page) => (
+                {homeCards.map((page) => (
                     <Link
                         key={page.to}
                         to={page.to}
