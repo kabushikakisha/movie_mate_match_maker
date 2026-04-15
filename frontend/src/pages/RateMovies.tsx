@@ -36,6 +36,44 @@ export default function RateMovies() {
       );
   }, []);
 
+  const rateMovie = (movieId: number, rating: number) => {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("user_id");
+
+    if (!token || !userId) {
+      setState({status: "error", message: "Authentication required to rate movies."});
+      return;
+    }
+
+    fetch("/api/ratings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        movie_id: movieId,
+        user_id: parseInt(userId),
+        rating: rating,
+      }),
+    })
+        .then((res) => {
+          if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+          return res.json();
+        })
+        .then(() => {
+          // Remove the rated movie from the list
+          setState(prev => {
+            if (prev.status !== "ok") return prev;
+            const updatedMovies = prev.movies.filter(movie => movie.id !== movieId);
+            return {status: "ok", movies: updatedMovies};
+          });
+        })
+        .catch((err: unknown) =>
+            setState({status: "error", message: String(err)}),
+        );
+  }
+
   return (
     <div className="mx-auto mt-24 max-w-2xl px-4">
       <h1 className="mb-6 text-3xl font-bold text-white">Rate Movies</h1>
