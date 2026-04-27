@@ -14,12 +14,16 @@ use crate::models::_entities::{
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
+    pub movie_id: i32,
+    pub user_id: i32,
     pub rating: Option<i16>,
     }
 
 impl Params {
     fn update(&self, item: &mut ActiveModel) {
-      item.rating = Set(self.rating.clone());
+        item.movie_id = Set(self.movie_id);
+        item.user_id = Set(self.user_id);
+        item.rating = Set(self.rating.clone());
       }
 }
 
