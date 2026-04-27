@@ -14,17 +14,15 @@ use crate::models::_entities::{
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
-    pub movie_id: i32,
-    pub user_id: i32,
     pub rating: Option<i16>,
-    }
+    pub movie_id: i32,
+}
 
 impl Params {
     fn update(&self, item: &mut ActiveModel) {
+        item.rating = Set(self.rating);
         item.movie_id = Set(self.movie_id);
-        item.user_id = Set(self.user_id);
-        item.rating = Set(self.rating.clone());
-      }
+    }
 }
 
 async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
@@ -38,10 +36,16 @@ pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
 }
 
 #[debug_handler]
-pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> Result<Response> {
+pub async fn add(
+    auth: auth::JWT,
+    State(ctx): State<AppContext>,
+    Json(params): Json<Params>,
+) -> Result<Response> {
+    let user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
     let mut item = ActiveModel {
         ..Default::default()
     };
+    item.user_id = Set(user.id);
     params.update(&mut item);
     let item = item.insert(&ctx.db).await?;
     format::json(item)

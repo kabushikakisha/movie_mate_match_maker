@@ -15,6 +15,7 @@ type FetchState =
 
 export default function RateMovies() {
   const [state, setState] = useState<FetchState>({ status: "loading" });
+  const [submitting, setSubmitting] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -36,43 +37,39 @@ export default function RateMovies() {
       );
   }, []);
 
-  const rateMovie = (movieId: number, rating: number) => {
+  const rateMovie = async (movieId: number, rating: number) => {
     const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("user_id");
+    if (!token) return;
 
-    if (!token || !userId) {
-      setState({status: "error", message: "Authentication required to rate movies."});
-      return;
+    setSubmitting((prev) => new Set(prev).add(movieId));
+
+    try {
+      const res = await fetch("/api/ratings/", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ rating, movie_id: movieId }),
+      });
+
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+
+      setState((prev) =>
+        prev.status === "ok"
+          ? { status: "ok", movies: prev.movies.filter((m) => m.id !== movieId) }
+          : prev,
+      );
+    } catch (err) {
+      console.error("Failed to submit rating:", err);
+    } finally {
+      setSubmitting((prev) => {
+        const next = new Set(prev);
+        next.delete(movieId);
+        return next;
+      });
     }
-
-    fetch("/api/ratings", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        movie_id: movieId,
-        user_id: parseInt(userId),
-        rating: rating,
-      }),
-    })
-        .then((res) => {
-          if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-          return res.json();
-        })
-        .then(() => {
-          // Remove the rated movie from the list
-          setState(prev => {
-            if (prev.status !== "ok") return prev;
-            const updatedMovies = prev.movies.filter(movie => movie.id !== movieId);
-            return {status: "ok", movies: updatedMovies};
-          });
-        })
-        .catch((err: unknown) =>
-            setState({status: "error", message: String(err)}),
-        );
-  }
+  };
 
   return (
     <div className="mx-auto mt-24 max-w-2xl px-4">
@@ -104,6 +101,18 @@ export default function RateMovies() {
                 {movie.genre && <span>{movie.genre}</span>}
                 {movie.time && <span>{movie.time} min</span>}
                 {movie.availability && <span>{movie.availability}</span>}
+              </div>
+              <div className="mt-3 flex gap-2">
+                {[1, 2, 3, 4, 5].map((rating) => (
+                  <button
+                    key={rating}
+                    disabled={submitting.has(movie.id)}
+                    onClick={() => rateMovie(movie.id, rating)}
+                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-600 bg-slate-700 text-sm font-medium text-slate-300 transition-colors hover:border-indigo-500 hover:bg-indigo-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {rating}
+                  </button>
+                ))}
               </div>
             </li>
           ))}
