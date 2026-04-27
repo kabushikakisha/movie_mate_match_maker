@@ -50,7 +50,7 @@ pub async fn add(
     let item = item.insert(&ctx.db).await?;
     format::json(item)
 }
-
+// test
 #[debug_handler]
 pub async fn update(
     Path(id): Path<i32>,
