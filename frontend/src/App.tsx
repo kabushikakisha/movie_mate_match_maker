@@ -5,6 +5,7 @@ import About from "./pages/About";
 import Movie from "./pages/Movie";
 import RateMovies from "./pages/RateMovies";
 import ChooseMovies from "./pages/ChooseMovies";
+import Movies from "./pages/Movies";
 
 export default function App() {
     return (
@@ -12,6 +13,7 @@ export default function App() {
             <NavBar
             items={[
                 {label: "Home", to: "/"},
+                {label: "See All Movies", to: "/movies"},
                 {label: "Enter Movie", to: "/movie"},
                 {label: "Rate Movies", to: "/rate"},
                 {label: "Choose Movies", to: "/choose"},
@@ -20,6 +22,7 @@ export default function App() {
             />
             <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/movies" element={<Movies />} />
                 <Route path="/movie" element={<Movie />} />
                 <Route path="/rate" element={<RateMovies />} />
                 <Route path="/choose" element={<ChooseMovies />} />

@@ -86,6 +86,7 @@ export default function Movie() {
                     throw new Error('Failed to create movie');
                 }
                 const result = await response.json();
+                console.log('Movie created:', result);
             } catch (error) {
                 console.error('Error creating movie:', error);
             }
@@ -93,32 +94,54 @@ export default function Movie() {
     }
     
     return (
-        <div>
-            <h1>Movie Form</h1>
-            <form onSubmit={handleFormSubmit}>
-            <input
-                type="text"
-                value={name}
-                onChange={handleNameFieldChange}
-            />
-            <input
-                type="number"
-                value={time}
-                onChange={handleTimeFieldChange}
-            />
-            <input
-                type="text"
-                value={genre}
-                onChange={handleGenreFieldChange}
-            />
-            <input
-                type="text"
-                value={availability}
-                onChange={handleAvailabilityFieldChange}
-            />
-            <button type="submit">
-                {id ? 'Update Movie' : 'Create Movie'}
-            </button>
+        <div className="p-6 max-w-lg mx-auto">
+            <h1 className="text-2xl font-bold mb-6">Movie Form</h1>
+            <form className="space-y-4" onSubmit={handleFormSubmit}>
+                <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">Movie Name</label>
+                    <input
+                        id="name"
+                        type="text"
+                        value={name}
+                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        onChange={handleNameFieldChange}
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700" htmlFor="time">Movie Time</label>
+                    <input
+                        id="time"
+                        type="number"
+                        value={time}
+                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        onChange={handleTimeFieldChange}
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700" htmlFor="genre">Movie Genre</label>
+                    <input
+                        id="genre"
+                        type="text"
+                        value={genre}
+                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        onChange={handleGenreFieldChange}
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700" htmlFor="availability">Movie Availability</label>
+                    <input
+                        id="availability"
+                        type="text"
+                        value={availability}
+                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        onChange={handleAvailabilityFieldChange}
+                    />
+                </div>
+                <button
+                    className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    type="submit">
+                    {id ? 'Update Movie' : 'Create Movie'}
+                </button>
             </form>
         </div>
     )
